@@ -3,9 +3,9 @@ import os
 import torch
 
 def get_config(config):
-    config = os.path.join('../',config)
+    config = os.path.join('./',config)
     with open(config, 'r') as stream:
-        return yaml.load(stream)
+        return yaml.load(stream, Loader=yaml.SafeLoader)
 
 def remove_prefix(state_dict, prefix):
     f = lambda x: x.split(prefix, 1)[-1] if x.startswith(prefix) else x

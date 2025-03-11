@@ -6,9 +6,9 @@ get_direct: False
 
 used_domain: gta
 
-rootA: /path/to/train_src.txt
+rootA: ./gta.txt
 
-rootB: /path/to/train_target.txt
+rootB: ./city.txt
 
 infotxt: ///
 
@@ -28,7 +28,7 @@ affine: False
 
 domain_code: 0
 
-vgg: ../vgg_model/vgg_normalised.pth
+vgg: ./vgg_model/vgg_normalised.pth
 
 lr: 0.0001
 
