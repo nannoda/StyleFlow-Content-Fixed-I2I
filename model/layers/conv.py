@@ -40,14 +40,14 @@ class InvConv2dLU(nn.Module):
         u_mask = np.triu(np.ones_like(w_u), 1)
         l_mask = u_mask.T
 
-        w_p = torch.from_numpy(w_p)
-        w_l = torch.from_numpy(w_l)
-        w_s = torch.from_numpy(w_s)
-        w_u = torch.from_numpy(w_u)
+        w_p = torch.from_numpy(w_p.copy())
+        w_l = torch.from_numpy(w_l.copy())
+        w_s = torch.from_numpy(w_s.copy())
+        w_u = torch.from_numpy(w_u.copy())
 
         self.register_buffer('w_p', w_p)
-        self.register_buffer('u_mask', torch.from_numpy(u_mask))
-        self.register_buffer('l_mask', torch.from_numpy(l_mask))
+        self.register_buffer('u_mask', torch.from_numpy(u_mask.copy()))
+        self.register_buffer('l_mask', torch.from_numpy(l_mask.copy()))
         self.register_buffer('s_sign', torch.sign(w_s))
         self.register_buffer('l_eye', torch.eye(l_mask.shape[0]))
         self.w_l = nn.Parameter(w_l)
@@ -64,7 +64,7 @@ class InvConv2dLU(nn.Module):
         weight = (
             self.w_p
             @ (self.w_l * self.l_mask + self.l_eye)
-            @ ((self.w_u * self.u_mask) + torch.diag(self.s_sign * torch.exp(self.w_s)))
+            @ ((self.w_u * self.u_mask) + torch.diag(self.s_sign * torch.exp(self.w_s) + 1e-5))
         )
 
         return weight.unsqueeze(2).unsqueeze(3)
