@@ -16,6 +16,8 @@ read_from_file: True
 
 train_vr: False
 
+keep_ratio: 0.8
+
 pathA: None
 
 n_flow: 15
