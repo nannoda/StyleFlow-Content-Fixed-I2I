@@ -30,6 +30,8 @@ affine: False
 
 domain_code: 0
 
+loss: tv_loss
+
 vgg: ./vgg_model/vgg_normalised.pth
 
 lr: 0.0001

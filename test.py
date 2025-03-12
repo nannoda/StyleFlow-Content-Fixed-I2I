@@ -84,15 +84,15 @@ def main():
 
     vgg = net.vgg
     vgg.load_state_dict(torch.load(args['vgg']))
-    encoder = net.Net(vgg).cuda()    
+    encoder = net.Net(vgg).cpu()    
 
     # model = model.to(device)
-    model.cuda()
+    model.cpu()
     # model = nn.DataParallel(model)
     model.eval()
     for batch_id, (imgA, imgB, name) in enumerate(test_loader):
-        base_code = encoder.cat_tensor(imgB.cuda())
-        stylized = model(imgA.cuda(),domain_class=base_code.cuda())
+        base_code = encoder.cat_tensor(imgB.cpu())
+        stylized = model(imgA.cpu(),domain_class=base_code.cpu())
         stylized = torch.clamp(stylized,0,1)
         output_name = os.path.join(args['output'], args['task_name'],'img_gen', name[0])
         save_image(stylized.cpu(), output_name, nrow=1)

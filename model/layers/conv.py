@@ -12,15 +12,16 @@ class InvConv2d(nn.Module):
             out_channel = in_channel
         weight = torch.randn(in_channel, out_channel)
         q, _ = torch.qr(weight)
-        weight = q.unsqueeze(2).unsqueeze(3)
+        weight = q.unsqueeze(2).unsqueeze(3).cpu()
         self.weight = nn.Parameter(weight)
 
     def forward(self, input):
-        _, _, height, width = input.shape
+        input = input.cpu()
         out = F.conv2d(input, self.weight)
         return out
 
     def reverse(self, output):
+        output = output.cpu()
         return F.conv2d(
             output, self.weight.squeeze().inverse().unsqueeze(2).unsqueeze(3)
         )
@@ -40,51 +41,37 @@ class InvConv2dLU(nn.Module):
         u_mask = np.triu(np.ones_like(w_u), 1)
         l_mask = u_mask.T
 
-        w_p = torch.from_numpy(w_p.copy())
-        w_l = torch.from_numpy(w_l.copy())
-        w_s = torch.from_numpy(w_s.copy())
-        w_u = torch.from_numpy(w_u.copy())
+        w_p = torch.from_numpy(w_p.copy()).cpu()
+        w_l = torch.from_numpy(w_l.copy()).cpu()
+        w_s = torch.from_numpy(w_s.copy()).cpu()
+        w_u = torch.from_numpy(w_u.copy()).cpu()
 
         self.register_buffer('w_p', w_p)
-        self.register_buffer('u_mask', torch.from_numpy(u_mask.copy()))
-        self.register_buffer('l_mask', torch.from_numpy(l_mask.copy()))
-        self.register_buffer('s_sign', torch.sign(w_s))
-        self.register_buffer('l_eye', torch.eye(l_mask.shape[0]))
+        self.register_buffer('u_mask', torch.from_numpy(u_mask.copy()).cpu())
+        self.register_buffer('l_mask', torch.from_numpy(l_mask.copy()).cpu())
+        self.register_buffer('s_sign', torch.sign(w_s).cpu())
+        self.register_buffer('l_eye', torch.eye(l_mask.shape[0]).cpu())
         self.w_l = nn.Parameter(w_l)
         self.w_s = nn.Parameter(torch.log(torch.abs(w_s)))
         self.w_u = nn.Parameter(w_u)
-        # self.w_p = w_p
 
     def forward(self, input):
-        _, _, height, width = input.shape
+        input = input.cpu()
         weight = self.calc_weight()
         out = F.conv2d(input, weight)
         return out
 
     def calc_weight(self):
-        torch.cuda.empty_cache()
-        torch.cuda.memory_summary(device=None, abbreviated=False)
-
-        print("Checking tensor values:")
-        print("w_p:", torch.isnan(self.w_p).any(), torch.isinf(self.w_p).any())
-        print("w_l:", torch.isnan(self.w_l).any(), torch.isinf(self.w_l).any())
-        print("w_u:", torch.isnan(self.w_u).any(), torch.isinf(self.w_u).any())
-        print("w_s:", torch.isnan(self.w_s).any(), torch.isinf(self.w_s).any())
-    
         weight = (
             self.w_p
             @ (self.w_l * self.l_mask + self.l_eye)
             @ ((self.w_u * self.u_mask) + torch.diag(self.s_sign * torch.exp(self.w_s) + 1e-5))
         )
-        
-        print("Weight:", torch.isnan(weight).any(), torch.isinf(weight).any())
-
-
-        return weight.unsqueeze(2).unsqueeze(3)
+        return weight.unsqueeze(2).unsqueeze(3).cpu()
 
     def reverse(self, output):
+        output = output.cpu()
         weight = self.calc_weight()
-
         return F.conv2d(output, weight.squeeze().inverse().unsqueeze(2).unsqueeze(3))
 
 
@@ -92,14 +79,14 @@ class ZeroConv2d(nn.Module):
     def __init__(self, in_channel, out_channel, padding=1):
         super().__init__()
 
-        self.conv = nn.Conv2d(in_channel, out_channel, 3, padding=0)
+        self.conv = nn.Conv2d(in_channel, out_channel, 3, padding=0).cpu()
         self.conv.weight.data.zero_()
         self.conv.bias.data.zero_()
-        self.scale = nn.Parameter(torch.zeros(1, out_channel, 1, 1))
+        self.scale = nn.Parameter(torch.zeros(1, out_channel, 1, 1).cpu())
 
     def forward(self, input):
+        input = input.cpu()
         out = F.pad(input, [1, 1, 1, 1], value=1)
         out = self.conv(out)
         out = out * torch.exp(self.scale * 3)
-
         return out
