@@ -3,7 +3,7 @@ import uuid
 from PIL import Image
 import argparse
 
-def resize_images(input_path, output_path, size=(512, 512)):
+def resize_images(input_path, output_path, size=(128, 128)):
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     

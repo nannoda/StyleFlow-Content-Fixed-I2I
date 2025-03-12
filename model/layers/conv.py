@@ -53,6 +53,7 @@ class InvConv2dLU(nn.Module):
         self.w_l = nn.Parameter(w_l)
         self.w_s = nn.Parameter(torch.log(torch.abs(w_s)))
         self.w_u = nn.Parameter(w_u)
+        # self.w_p = w_p
 
     def forward(self, input):
         _, _, height, width = input.shape
@@ -61,11 +62,23 @@ class InvConv2dLU(nn.Module):
         return out
 
     def calc_weight(self):
+        torch.cuda.empty_cache()
+        torch.cuda.memory_summary(device=None, abbreviated=False)
+
+        print("Checking tensor values:")
+        print("w_p:", torch.isnan(self.w_p).any(), torch.isinf(self.w_p).any())
+        print("w_l:", torch.isnan(self.w_l).any(), torch.isinf(self.w_l).any())
+        print("w_u:", torch.isnan(self.w_u).any(), torch.isinf(self.w_u).any())
+        print("w_s:", torch.isnan(self.w_s).any(), torch.isinf(self.w_s).any())
+    
         weight = (
             self.w_p
             @ (self.w_l * self.l_mask + self.l_eye)
             @ ((self.w_u * self.u_mask) + torch.diag(self.s_sign * torch.exp(self.w_s) + 1e-5))
         )
+        
+        print("Weight:", torch.isnan(weight).any(), torch.isinf(weight).any())
+
 
         return weight.unsqueeze(2).unsqueeze(3)
 
