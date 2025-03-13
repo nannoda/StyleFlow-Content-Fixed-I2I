@@ -50,11 +50,11 @@ total_epoch: 10
 
 batch_size: 1
 
-bn_group: 4
+bn_group: 1
 
 bn_sync_stats: True
 
-workers: 4
+workers: 1
 
 mse_weight: 0
 
