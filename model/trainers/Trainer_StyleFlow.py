@@ -38,7 +38,7 @@ def get_smooth(I, direction):
         #smooth
         weights = torch.tensor([[0., 0.],
                                 [-1., 1.]]
-                                ).cpu()
+                                ).cuda()
         weights_x = weights.view(1, 1, 2, 2).repeat(1, 1, 1, 1)
         weights_y = torch.transpose(weights_x, 0, 1)
         if direction == 'x':
@@ -69,43 +69,43 @@ class Trainer():
         Mmodel = merge_model(cfg)
         
         self.model = Mmodel
-        self.model.cpu()
+        self.model.cuda()
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=cfg['lr'])
         self.lr_scheduler = IterLRScheduler(self.optimizer, cfg['lr_steps'], cfg['lr_mults'], last_iter=cfg['last_iter'])
         
         vgg = net.vgg
         vgg.load_state_dict(torch.load(cfg['vgg']))
-        self.encoder = net.Net(vgg,cfg['keep_ratio']).cpu()
-        self.tvloss = TVLoss().cpu()
+        self.encoder = net.Net(vgg,cfg['keep_ratio']).cuda()
+        self.tvloss = TVLoss().cuda()
 
         self.logger = SummaryWriter(os.path.join(self.cfg['output'],self.cfg['task_name'],'runs'))
 
     def train(self,batch_id, content_iter, style_iter, source_iter, target_iter, code_iter, imgA_aug, imgB_aug, imgC_aug, imgD_aug):
-        content_images = content_iter.cpu()
-        style_images = style_iter.cpu()
+        content_images = content_iter.cuda()
+        style_images = style_iter.cuda()
         target_style = style_iter
         
-        domain_weight = torch.tensor(1).cpu()
+        domain_weight = torch.tensor(1).cuda()
 
         if self.init:
-            base_code = self.encoder.cat_tensor(style_images.cpu())
-            self.model(content_images,domain_class=base_code.cpu())
+            base_code = self.encoder.cat_tensor(style_images.cuda())
+            self.model(content_images,domain_class=base_code.cuda())
             self.init = False
             return
 
-        base_code = self.encoder.cat_tensor(target_style.cpu())
-        stylized = self.model(content_images,domain_class=base_code.cpu())
+        base_code = self.encoder.cat_tensor(target_style.cuda())
+        stylized = self.model(content_images,domain_class=base_code.cuda())
         stylized = torch.clamp(stylized,0,1)
 
         if self.cfg['loss'] == 'tv_loss':
             smooth_loss = self.tvloss(stylized)
         else:
-            smooth_loss = get_gradients_loss(stylized, target_style.cpu())
+            smooth_loss = get_gradients_loss(stylized, target_style.cuda())
         
 
         loss_c, loss_s = self.encoder(content_images, style_images, stylized, domain_weight)
-        loss_c = loss_c.mean().cpu()
-        loss_s = loss_s.mean().cpu()
+        loss_c = loss_c.mean().cuda()
+        loss_s = loss_s.mean().cuda()
 
         Loss = self.cfg['content_weight']*loss_c + self.cfg['style_weight']*loss_s + smooth_loss#  + self.cfg['histo_weight']*hist_loss #+ self.cfg['mse_weight']*loss_mse
 
@@ -127,8 +127,8 @@ class Trainer():
 
         if batch_id % 100 == 0:
             output_name = os.path.join(self.cfg['output'], self.cfg['task_name'],'img_save', 
-                            str(batch_id)+'_'+str(code_iter[0].cpu().numpy()[0])+'.jpg')
-            output_images = torch.cat((content_images.cpu(), style_images.cpu(), stylized.cpu(),target_style.cpu()), 
+                            str(batch_id)+'_'+str(code_iter[0].cuda().numpy()[0])+'.jpg')
+            output_images = torch.cat((content_images.cuda(), style_images.cuda(), stylized.cuda(),target_style.cuda()), 
                                     0)
             save_image(output_images, output_name, nrow=1)
 
