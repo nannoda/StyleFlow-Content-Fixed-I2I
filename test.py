@@ -95,7 +95,7 @@ def main():
         stylized = model(imgA.cuda(),domain_class=base_code.cuda())
         stylized = torch.clamp(stylized,0,1)
         output_name = os.path.join(args['output'], args['task_name'],'img_gen', name[0])
-        save_image(stylized.cuda(), output_name, nrow=1)
+        save_image(stylized.cpu(), output_name, nrow=1)
 
 if __name__ == "__main__":
     main()

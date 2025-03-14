@@ -127,10 +127,11 @@ class Trainer():
 
         if batch_id % 100 == 0:
             output_name = os.path.join(self.cfg['output'], self.cfg['task_name'],'img_save', 
-                            str(batch_id)+'_'+str(code_iter[0].cuda().numpy()[0])+'.jpg')
-            output_images = torch.cat((content_images.cuda(), style_images.cuda(), stylized.cuda(),target_style.cuda()), 
+                            str(batch_id)+'_'+str(code_iter[0].cpu().numpy()[0])+'.jpg')
+            output_images = torch.cat((content_images.cpu(), style_images.cpu(), stylized.cpu(),target_style.cpu()), 
                                     0)
             save_image(output_images, output_name, nrow=1)
+
 
 
         if batch_id % 500 == 0:
