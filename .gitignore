@@ -8,3 +8,7 @@ events.out.*
 *.jpg
 
 *.tar
+
+/datasets
+
+/output

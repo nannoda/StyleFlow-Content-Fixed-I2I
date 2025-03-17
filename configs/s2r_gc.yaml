@@ -1,6 +1,6 @@
 job_name: s2r
 
-output: ./output/
+output: ../drive/MyDrive/sim2real/output
 
 get_direct: False
 
