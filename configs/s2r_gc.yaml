@@ -52,7 +52,7 @@ bn_group: 4
 
 bn_sync_stats: True
 
-workers: 2
+workers: 4
 
 mse_weight: 0
 
@@ -66,7 +66,7 @@ histo_weight: 0
 
 keep_percent: 1
 
-keep_ratio: 0.5
+keep_ratio: 0.8
 
 resume: False
 
