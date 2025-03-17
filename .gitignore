@@ -12,3 +12,6 @@ events.out.*
 /datasets
 
 /output
+/o2
+/idk
+/tmp*
