@@ -9,21 +9,15 @@ import model.network.net as net
 
 from torchvision.utils import save_image
 from model.network.glow import Glow
+from model.utils.device import TORCH_DEV, USE_COLAB_TPU
 from model.utils.utils import IterLRScheduler, remove_prefix
 from tensorboardX import SummaryWriter
 from model.layers.activation_norm import calc_mean_std
 from model.losses.tv_loss import TVLoss
 
 # TPU Support
-try:
-    import torch_xla
-    import torch_xla.core.xla_model as xm
-    TPU_AVAILABLE = True
-except ImportError:
-    TPU_AVAILABLE = False
-
 # Set device
-torch_device = xm.xla_device() if TPU_AVAILABLE else torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+torch_device = TORCH_DEV
 
 def set_random_seed(seed):
     random.seed(seed)
@@ -33,7 +27,8 @@ def set_random_seed(seed):
     torch.cuda.manual_seed_all(seed)
 
 def save_checkpoint(state, filename):
-    if TPU_AVAILABLE:
+    if USE_COLAB_TPU:
+        import torch_xla.core.xla_model as xm
         xm.save(state, filename+'.pth.tar')  # TPU optimized saving
     else:
         torch.save(state, filename+'.pth.tar')
@@ -115,7 +110,8 @@ class Trainer():
         self.lr_scheduler.step()
         self.optimizer.zero_grad()
 
-        if TPU_AVAILABLE:
+        if USE_COLAB_TPU:
+            import torch_xla.core.xla_model as xm
             xm.mark_step()  # TPU sync
 
         current_lr = self.lr_scheduler.get_lr()[0]

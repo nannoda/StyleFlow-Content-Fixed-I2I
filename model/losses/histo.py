@@ -2,16 +2,10 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-# TPU Support
-try:
-    import torch_xla
-    import torch_xla.core.xla_model as xm
-    TPU_AVAILABLE = True
-except ImportError:
-    TPU_AVAILABLE = False
+from model.utils.device import TORCH_DEV
 
 # Set device
-torch_device = xm.xla_device() if TPU_AVAILABLE else torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+torch_device = TORCH_DEV
 
 
 class RGBuvHistBlock(nn.Module):

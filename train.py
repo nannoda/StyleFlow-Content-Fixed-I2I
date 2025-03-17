@@ -3,13 +3,8 @@ import os
 import torch
 from torch.utils.data import DataLoader
 
-try:
-    import torch_xla
-    import torch_xla.core.xla_model as xm
-    import torch_xla.distributed.parallel_loader as pl
-    TPU_AVAILABLE = True
-except ImportError:
-    TPU_AVAILABLE = False
+# from model.losses.histo import TPU_AVAILABLE
+from model.utils.device import TORCH_DEV, USE_COLAB_TPU
 
 from model.trainers.Trainer_StyleFlow import Trainer, set_random_seed
 from model.utils.dataset import get_data_loader_folder_pair
@@ -28,16 +23,8 @@ def parse_args():
 
 def main():
     torch.backends.cudnn.benchmark = True
-
-    if TPU_AVAILABLE and 'COLAB_TPU_ADDR' in os.environ:
-        torch_device = xm.xla_device()
-        print("Using TPU")
-    elif torch.cuda.is_available():
-        torch_device = torch.device('cuda')
-        print(f"Using CUDA: {torch.cuda.get_device_name(0)}")
-    else:
-        torch_device = torch.device('cpu')
-        print("Using CPU")
+    
+    torch_device = TORCH_DEV
 
     print(f"Device: {torch_device}")
     set_random_seed(0)
@@ -71,7 +58,9 @@ def main():
         batch = [x.to(torch_device) for x in batch]  # Move tensors to TPU/CUDA
         trainer.train(batch_id, *batch)
 
-        if TPU_AVAILABLE:
+        
+        if USE_COLAB_TPU:
+            import torch_xla.core.xla_model as xm
             xm.mark_step()  # Ensure TPU execution
 
     print("Training completed.")
