@@ -1,16 +1,15 @@
 import argparse
 import os
 import torch
+import time
 from torch.utils.data import DataLoader
+from tqdm import tqdm  # For progress bar
 
-# from model.losses.histo import TPU_AVAILABLE
 from model.utils.device import TORCH_DEV, USE_COLAB_TPU
-
 from model.trainers.Trainer_StyleFlow import Trainer, set_random_seed
 from model.utils.dataset import get_data_loader_folder_pair
 from model.utils.sampler import DistributedGivenIterationSampler
 from model.utils.utils import get_config
-
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -20,12 +19,9 @@ def parse_args():
     print('Job name: ', args['job_name'])
     return args
 
-
 def main():
     torch.backends.cudnn.benchmark = True
-    
     torch_device = TORCH_DEV
-
     print(f"Device: {torch_device}")
     set_random_seed(0)
 
@@ -35,7 +31,6 @@ def main():
     # Create necessary directories
     os.makedirs(os.path.join(args['output'], args['task_name'], 'img_save'), exist_ok=True)
     os.makedirs(os.path.join(args['output'], args['task_name'], 'model_save'), exist_ok=True)
-    
     print("Directories created.")
 
     trainer = Trainer(args)
@@ -54,17 +49,25 @@ def main():
         num_workers=args['workers'], pin_memory=False, sampler=train_sampler
     )
 
-    for batch_id, batch in enumerate(train_loader):
+    total_batches = len(train_loader)
+    start_time = time.time()
+
+    for batch_id, batch in enumerate(tqdm(train_loader, desc='Training Progress', unit='batch')):
         batch = [x.to(torch_device) for x in batch]  # Move tensors to TPU/CUDA
         trainer.train(batch_id, *batch)
 
+        elapsed_time = time.time() - start_time
+        avg_time_per_batch = elapsed_time / (batch_id + 1)
+        estimated_total_time = avg_time_per_batch * total_batches
+        remaining_time = estimated_total_time - elapsed_time
         
+        # print(f"\rBatch {batch_id+1}/{total_batches} - Elapsed: {elapsed_time:.2f}s - Remaining: {remaining_time:.2f}s", end='', flush=True)
+
         if USE_COLAB_TPU:
             import torch_xla.core.xla_model as xm
             xm.mark_step()  # Ensure TPU execution
 
     print("Training completed.")
-
 
 if __name__ == "__main__":
     main()
