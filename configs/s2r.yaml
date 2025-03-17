@@ -56,17 +56,17 @@ workers: 2
 
 mse_weight: 0
 
-style_weight: 0.9
+style_weight: 1
 
 p_weight: 0.00
 
-content_weight: 0.2
+content_weight: 0.1
 
 histo_weight: 0
 
 keep_percent: 1
 
-keep_ratio: 0.6
+keep_ratio: 0.8
 
 resume: False
 
