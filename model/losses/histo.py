@@ -2,10 +2,22 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+# TPU Support
+try:
+    import torch_xla
+    import torch_xla.core.xla_model as xm
+    TPU_AVAILABLE = True
+except ImportError:
+    TPU_AVAILABLE = False
+
+# Set device
+torch_device = xm.xla_device() if TPU_AVAILABLE else torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 class RGBuvHistBlock(nn.Module):
   def __init__(self, h=64, insz=150, resizing='interpolation',
                method='inverse-quadratic', sigma=0.02, intensity_scale=True,
-               device='cuda'):
+               device=torch_device):
     """ Computes the RGB-uv histogram feature of a given image.
     Args:
       h: histogram dimension size (scalar). The default value is 64.

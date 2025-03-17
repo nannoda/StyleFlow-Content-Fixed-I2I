@@ -1357,10 +1357,10 @@ name = "requests"
 version = "2.32.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "certifi", marker = "python_full_version < '3.9'" },
-    { name = "charset-normalizer", marker = "python_full_version < '3.9'" },
-    { name = "idna", marker = "python_full_version < '3.9'" },
-    { name = "urllib3", marker = "python_full_version < '3.9'" },
+    { name = "certifi" },
+    { name = "charset-normalizer" },
+    { name = "idna" },
+    { name = "urllib3" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760", size = 131218 }
 wheels = [
@@ -1736,6 +1736,7 @@ dependencies = [
     { name = "tensorboardx" },
     { name = "torch", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "torch", version = "2.6.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "torch-xla" },
     { name = "torchvision", version = "0.20.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "torchvision", version = "0.21.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
@@ -1749,6 +1750,7 @@ requires-dist = [
     { name = "tensorboard", specifier = ">=2.0.0" },
     { name = "tensorboardx", specifier = ">=2.6.2.2" },
     { name = "torch", specifier = ">=2.5.1" },
+    { name = "torch-xla", specifier = ">=2.6.0" },
     { name = "torchvision", specifier = ">=0.20.1" },
 ]
 
@@ -2054,6 +2056,26 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ee/11/08774a8198a33263947c59e04b8a0bf85a61a44e82100c46cf833bbce35e/torch-2.6.0-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:bb2c6c3e65049f081940f5ab15c9136c7de40d3f01192541c920a07c7c585b7e", size = 95782656 },
     { url = "https://files.pythonhosted.org/packages/c1/0d/56fb07032accbfebb4555638b6002ec5678d0942da85497e40f9405ab756/torch-2.6.0-cp39-cp39-win_amd64.whl", hash = "sha256:683410f97984103148e31b38a8631acf31c3034c020c0f4d26171e7626d8317a", size = 204061417 },
     { url = "https://files.pythonhosted.org/packages/b3/17/41f681b87290a1d2f1394f943e470f8b0b3c2987b7df8dc078d8831fce5b/torch-2.6.0-cp39-none-macosx_11_0_arm64.whl", hash = "sha256:265f70de5fd45b864d924b64be1797f86e76c8e48a02c2a3a6fc7ec247d2226c", size = 66520446 },
+]
+
+[[package]]
+name = "torch-xla"
+version = "2.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "absl-py" },
+    { name = "importlib-metadata", version = "8.5.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "importlib-metadata", version = "8.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "numpy", version = "1.24.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "numpy", version = "2.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "numpy", version = "2.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "pyyaml" },
+    { name = "requests" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fb/1d/211315fd610d97c220ae721e2958581a64af0ac21f1748e25f051277f3a8/torch_xla-2.6.0-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:fb6a34f7868e1866af7fa0a9fe853d54b104c717c563a7e75adf80613654f7cd", size = 93632648 },
+    { url = "https://files.pythonhosted.org/packages/43/5b/a599f0a9a97c76dcef5883b550d42e65f1599ec8bc2b31c5a9ca3e1c67a9/torch_xla-2.6.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:b9a228c203a2fbbf24cf159547a1497a201329874359bda6b2ce1e3708846ce5", size = 93633780 },
+    { url = "https://files.pythonhosted.org/packages/26/b1/c73f6e2bd3346886ba0d5f1e6609552a56cf0077dd568fc988421f5e57b0/torch_xla-2.6.0-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:003fe69dde1e63a6feed8dbc3c042b4f7fc0926c9463124e64c3c88f3cc7a291", size = 93634623 },
 ]
 
 [[package]]
