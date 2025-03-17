@@ -56,11 +56,11 @@ workers: 2
 
 mse_weight: 0
 
-style_weight: 1
+style_weight: 0.9
 
 p_weight: 0.00
 
-content_weight: 0.1
+content_weight: 0.2
 
 histo_weight: 0
 
