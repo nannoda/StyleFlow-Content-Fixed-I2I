@@ -1,9 +1,8 @@
 import argparse
 import os
 import torch
-import time
 from torch.utils.data import DataLoader
-from tqdm import tqdm  # For progress bar
+from tqdm import tqdm
 
 from model.utils.device import TORCH_DEV, USE_COLAB_TPU
 from model.trainers.Trainer_StyleFlow import Trainer, set_random_seed
@@ -25,7 +24,6 @@ def main():
     print(f"Device: {torch_device}")
     set_random_seed(0)
 
-    last_iter = -1
     args = parse_args()
 
     # Create necessary directories
@@ -34,6 +32,10 @@ def main():
     print("Directories created.")
 
     trainer = Trainer(args)
+    last_iter: int = int(trainer.start_iter)  # Resume from saved iteration
+    
+    print(f"last_iter: {last_iter}")
+
     train_dataset = get_data_loader_folder_pair(
         args['rootA'], args['rootB'], args['infotxt'], args['batch_size'],
         True, args['keep_percent'], get_direct=args['get_direct'],
@@ -49,7 +51,7 @@ def main():
         num_workers=args['workers'], pin_memory=False, sampler=train_sampler
     )
 
-    for batch_id, batch in enumerate(tqdm(train_loader, desc='Training Progress', unit='batch')):
+    for batch_id, batch in enumerate(tqdm(train_loader, desc='Training Progress', unit='batch', initial=last_iter), start=last_iter):
         batch = [x.to(torch_device) for x in batch]  # Move tensors to TPU/CUDA
         trainer.train(batch_id, *batch)
         if USE_COLAB_TPU:
@@ -57,6 +59,7 @@ def main():
             xm.mark_step()  # Ensure TPU execution
 
     print("Training completed.")
+
 
 if __name__ == "__main__":
     main()

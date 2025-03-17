@@ -193,13 +193,6 @@ class RGBuvHistBlock(nn.Module):
     return hists_normalized
 
 def compute_histo_loss(histo,src,tgt,weight,std=torch.tensor([0.485, 0.456, 0.406]),mean=torch.tensor([0.229, 0.224, 0.225])):
-    # mean = mean.reshape(-1, 1, 1).cuda()
-    # std = std.reshape(-1, 1, 1).cuda()
-
-    # src_p = (src * std) + mean
-    # tgt_p = (tgt * std) + mean
-
-
     input_hist = histo(src)
     target_hist = histo(tgt)
 

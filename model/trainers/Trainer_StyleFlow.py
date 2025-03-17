@@ -1,4 +1,6 @@
+import glob
 import random
+import re
 import numpy as np
 import os
 
@@ -81,6 +83,38 @@ class Trainer():
 
         self.logger = SummaryWriter(os.path.join(self.cfg['output'], self.cfg['task_name'], 'runs'))
 
+        self.start_iter = 0  # Default to starting from scratch
+        self.load_checkpoint()  # Attempt to resume training
+    def load_checkpoint(self):
+        checkpoint_dir = os.path.join(self.cfg['output'], self.cfg['task_name'], 'model_save')
+        checkpoint_files = glob.glob(os.path.join(checkpoint_dir, "*.pth.tar"))
+        
+        if not checkpoint_files:
+            print("No checkpoint file found, starting training from scratch. ")
+            return
+        
+         # Extract iteration numbers using regex
+        checkpoint_numbers = []
+        for file in checkpoint_files:
+            match = re.search(r"(\d+)\.ckpt\.pth\.tar$", file)
+            if match:
+                checkpoint_numbers.append((int(match.group(1)), file))
+                
+        if not checkpoint_numbers:
+            print("No valid checkpoint files found, starting from scratch.")
+            return
+
+        # Get the checkpoint file with the highest number
+        checkpoint_numbers.sort(reverse=True, key=lambda x: x[0])
+        latest_checkpoint = checkpoint_numbers[0][1]
+
+        print(f"Loading checkpoint: {latest_checkpoint}")
+        checkpoint = torch.load(latest_checkpoint, map_location=torch_device)
+        self.model.load_state_dict(checkpoint['state_dict'])
+        self.optimizer.load_state_dict(checkpoint['optimizer'])
+        self.start_iter = checkpoint['step']
+        print(f"Resumed training from iteration {self.start_iter}")
+            
     def train(self, batch_id, content_iter, style_iter, source_iter, target_iter, code_iter, imgA_aug, imgB_aug, imgC_aug, imgD_aug):
         content_images = content_iter.to(torch_device)
         style_images = style_iter.to(torch_device)

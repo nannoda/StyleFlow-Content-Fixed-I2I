@@ -17,13 +17,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
-
-# torch.device / CUDA Setup
 import os
 import torch
 
 USE_CUDA = False
-# use_colab_tpu = True
 USE_COLAB_TPU = False
 
 TORCH_DEV = torch.device('cpu')
