@@ -32,7 +32,7 @@ except:
     USE_COLAB_TPU = False
 
 if not USE_COLAB_TPU and torch.cuda.is_available():
-    TORCH_DEV = torch.device('cuda:0')
+    TORCH_DEV = torch.device('cuda')
     USE_CUDA = True
 
     # Set this to True to make your output immediately reproducible
