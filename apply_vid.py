@@ -82,7 +82,7 @@ def process_frame(model, encoder, frame, output_path: str):
     # Define image transformation (resize, normalize)
     transform = transforms.Compose(
         [
-            transforms.Resize((256, 512)),  # Resize input image if necessary
+            transforms.Resize((512, 1024)),  # Resize input image if necessary
             transforms.ToTensor(),
             transforms.Normalize(
                 mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]

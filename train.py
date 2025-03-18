@@ -58,7 +58,7 @@ def main():
         num_workers=args['workers'], pin_memory=False, sampler=train_sampler
     )
 
-    for batch_id, batch in enumerate(tqdm(train_loader, desc='Training Progress', unit='batch', initial=last_iter), start=last_iter):
+    for batch_id, batch in enumerate(tqdm(train_loader, desc='Training Progress', unit='batch', initial=last_iter, dynamic_ncols=True), start=last_iter):
         batch = [x.to(torch_device) for x in batch]  # Move tensors to TPU/CUDA
         trainer.train(batch_id, *batch)
         if USE_COLAB_TPU:

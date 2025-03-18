@@ -70,4 +70,4 @@ keep_ratio: 0.4
 
 resume: False
 
-task_name: s2r_tv_loss
+task_name: s2r_tv_loss_a
