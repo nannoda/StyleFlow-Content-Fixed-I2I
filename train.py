@@ -13,8 +13,15 @@ from model.utils.utils import get_config
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default='configs/predict.yaml')
+    parser.add_argument('--output', type=str)
     opts = parser.parse_args()
     args = get_config(opts.config)
+    # Ensure output is properly set
+    if opts.output:
+        args['output'] = opts.output  # Overwrite if provided
+    elif 'output' not in args or args['output'] is None:
+        raise ValueError("Output must be specified either in the config file or as a command-line argument.")
+
     print('Job name: ', args['job_name'])
     return args
 
